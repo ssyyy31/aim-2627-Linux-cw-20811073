@@ -1,10 +1,26 @@
 #!/bin/bash
-# Q5：运行 launch.env 给定的启动前检查，保存 stdout/stderr、真实退出码和诊断报告。
-# 完整接口与验收规格见 Problem.pdf。只修改本文件，不修改测试或工具。
+# Q5: run the pre-flight check and record its output, status, and diagnosis.
 set -eu
-input=${1:?需要输入目录}
-output=${2:?需要输出目录}
+input=${1:?input directory required}
+output=${2:?output directory required}
 
-# TODO：删除下方提示和 exit 77，再填写你的命令。
-printf '%s\n' 'Q5 尚未实现' >&2
-exit 77
+. "$input/launch.env"
+
+if bash "$LAUNCH_TOOL" "$MODEL_PATH" "$CAMERA_PATH" \
+    > "$output/stdout.log" 2> "$output/stderr.log"; then
+    status=0
+else
+    status=$?
+fi
+
+printf '%s\n' "$status" > "$output/exit-code.txt"
+
+case "$status" in
+    0)  result=SUCCESS; reason=NONE ;;
+    10) result=FAILED;  reason=MODEL_MISSING ;;
+    20) result=FAILED;  reason=CAMERA_DENIED ;;
+    *)  result=FAILED;  reason=UNKNOWN ;;
+esac
+
+printf 'result=%s\nexit_code=%s\nreason=%s\n' \
+    "$result" "$status" "$reason" > "$output/report.txt"
