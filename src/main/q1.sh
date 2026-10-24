@@ -1,10 +1,10 @@
 #!/bin/bash
-# Q1：定位 handover，读取隐藏编号和欢迎文本。输出 location.txt、robot-id.txt、welcome.txt。
-# 完整接口与验收规格见 Problem.pdf。只修改本文件，不修改测试或工具。
+# Q1: locate the handover directory and copy the robot id and welcome text.
 set -eu
-input=${1:?需要输入目录}
-output=${2:?需要输出目录}
+input=${1:?input directory required}
+output=${2:?output directory required}
 
-# TODO：删除下方提示和 exit 77，再填写你的命令。
-printf '%s\n' 'Q1 尚未实现' >&2
-exit 77
+location=$(cd "$input/handover" && pwd) 
+printf '%s\n' "$location" > "$output/location.txt"
+cat "$input/handover/.robot-id" > "$output/robot-id.txt"
+cat "$input/notes/welcome.txt" > "$output/welcome.txt"
